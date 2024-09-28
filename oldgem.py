@@ -22,7 +22,7 @@ elif "village" in address_components:
     city = address_components["village"]
 
 #configuring genai and checking the avilable models
-genai.configure(api_key="AIzaSyCRUpuFm2Nc17FbHNL-Fv-zNeogCDlqKBg")
+genai.configure(api_key="AIzaSyAlSRMwkkHtlsNkZJHrdjXRvD4zJdOsLKI")
 for m in genai.list_models():
   if 'generateContent' in m.supported_generation_methods:
     print(m.name)
@@ -46,17 +46,15 @@ def get_page_content(url):
         return None
 
 #extracting page content 
-def extract_text_from_page(page_soup):
-
-    elements_to_extract = ['p', 'ul', 'h1', 'h2', 'h3' ,'h4' ,'h5', ]
-    page_text = ""
-
-    for element_name in elements_to_extract:
-        elements = page_soup.find_all(element_name)
-        for element in elements:
-            page_text += element.get_text() + "\n"
-
-    return page_text
+def extract_text_excluding_unwanted(page_soup):
+    excluded_sections = ['header', 'footer', 'nav', 'script', 'style']
+    for section in excluded_sections:
+        unwanted_section = page_soup.find_all(section)
+        for tag in unwanted_section:
+            tag.decompose()
+    body_text = page_soup.get_text(separator=" ", strip=True)
+    cleaned_text = ' '.join(body_text.split())
+    return cleaned_text
 
 #a google search query
 def google_search(query ,base_url):
@@ -69,6 +67,7 @@ def google_search(query ,base_url):
     response = requests.get(base_url, params=params, headers=headers)
 
     if response.status_code == 200:
+
         
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -84,7 +83,7 @@ def google_search(query ,base_url):
                 page_content = get_page_content(link)
                 if page_content:
                     page_soup = BeautifulSoup(page_content, "html.parser")
-                    page_text = extract_text_from_page(page_soup)
+                    page_text = extract_text_excluding_unwanted(page_soup)
 
                     search_results.append({"title": title, "link": link, "page_text": page_text})
             else:
