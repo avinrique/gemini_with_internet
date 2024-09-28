@@ -33,13 +33,13 @@ os.environ["GOOGLE_API_KEY"] = "AIzaSyAlSRMwkkHtlsNkZJHrdjXRvD4zJdOsLKI"
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 model2 = ChatGoogleGenerativeAI(model="gemini-1.0-pro-latest",
-                             temperature=0.9)
+                             temperature=1)
 embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 
 
 
 
-pdf_file = "./data/a.pdf"
+pdf_file = "./data/farmerbook.pdf"
 pdf_loader = PyPDFLoader(pdf_file)
 pages = pdf_loader.load_and_split()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=0)
